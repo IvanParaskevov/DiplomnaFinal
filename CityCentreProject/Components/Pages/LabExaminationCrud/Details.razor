@@ -1,0 +1,35 @@
+﻿@page "/labExaminations/details"
+@using BusinessLayer
+@using ServiceLayer
+@inject DoctorManager DoctorService
+@inject NavigationManager NavigationManager
+
+<h3>Doctor Details</h3>
+
+@if (doctor != null)
+{
+    <p>Name: @doctor.UserName</p>
+}
+else
+{
+    <p>Doctor not found.</p>
+}
+
+<button @onclick="GoBack">Back to List</button>
+
+@code {
+
+    public string Id { get; set; }
+
+    private Doctor doctor;
+
+    protected override async Task OnInitializedAsync()
+    {
+        doctor = await DoctorService.ReadAsync(Id, true);
+    }
+
+    private void GoBack()
+    {
+        NavigationManager.NavigateTo("/doctors");
+    }
+}

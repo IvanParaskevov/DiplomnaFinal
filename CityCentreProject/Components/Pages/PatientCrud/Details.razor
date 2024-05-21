@@ -1,0 +1,43 @@
+﻿@page "/patients/details"
+@using BusinessLayer
+@using CityCentreProject.Components.Services
+@using ServiceLayer
+@inject PatientManager patientService
+@inject NavigationManager NavigationManager
+@inject StateContainer<Patient> patientContainer
+
+<h3>Patient Details</h3>
+
+@if (patient != null)
+{
+    <p>Name: @patient.FirstName</p>
+    <p>Name: @patient.SecondName</p>
+    <p>Name: @patient.LastName</p>
+    <p>Name: @patient.UserName</p>
+    <p>Name: @patient.PasswordHash</p>
+    <p>Name: @patient.PhoneNumber</p>
+    <p>Name: @patient.Email</p>
+}
+else
+{
+    <p>Patient not found.</p>
+}
+
+<button @onclick="GoBack">Back to List</button>
+
+@code {
+
+
+    private Patient patient;
+
+    protected override async Task OnInitializedAsync()
+    {
+        patient = patientContainer.Value;
+        await base.OnInitializedAsync();
+    }
+
+    private void GoBack()
+    {
+        NavigationManager.NavigateTo("/patients");
+    }
+}

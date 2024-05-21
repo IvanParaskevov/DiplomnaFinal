@@ -1,0 +1,52 @@
+﻿@page "/doctors/edit"
+@using BusinessLayer
+@using CityCentreProject.Components.Services
+@using ServiceLayer
+@inject DoctorManager doctorManager
+@inject NavigationManager NavigationManager
+@inject StateContainer<Doctor> doctorContainer
+
+<h3>Edit Doctor</h3>
+
+@if (doctor != null)
+{
+    <EditForm Model="@doctor" OnValidSubmit="UpdateDoctor">
+        <DataAnnotationsValidator />
+        <ValidationSummary />
+
+        <label>Name:</label>
+        <InputText @bind-Value="doctor.UserName" /><br />
+
+        <button type="submit">Save Changes</button>
+    </EditForm>
+}
+else
+{
+    <p>Doctor not found.</p>
+}
+
+<button @onclick="GoBack">Cancel</button>
+
+@code {
+
+    public int Id { get; set; }
+
+    private Doctor doctor;
+
+    protected override async Task OnInitializedAsync()
+    {
+        doctor = doctorContainer.Value;
+        await base.OnInitializedAsync();
+    }
+
+    private async Task UpdateDoctor()
+    {
+        await doctorManager.UpdateAsync(doctor);
+        NavigationManager.NavigateTo("/doctors");
+    }
+
+    private void GoBack()
+    {
+        NavigationManager.NavigateTo("/doctors");
+    }
+}

@@ -1,0 +1,137 @@
+﻿@page "/labResults"
+@using BusinessLayer
+@using CityCentreProject.Components.Services
+@using Microsoft.AspNetCore.Components.Forms
+@using Microsoft.AspNetCore.Identity
+@using ServiceLayer
+@inject LabExaminationManager labExaminationManager
+@inject PatientExaminationManager patientExamManager
+@inject UserManager<User> userManager
+@inject NavigationManager navigationManager
+@inject CustomAuthenticationStateProvider authState
+
+<h3>Lab Results</h3>
+
+@if (labExaminations != null)
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Examination Description</th>
+                <th>Status</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var examination in labExaminations)
+            {
+                <tr>
+                    <td>@examination.Description</td>
+                    <td>@(patientExaminations.AreLabResultsReady ? "Ready" : "Pending")</td>
+                    <td>
+                        @if (patientExaminations.AreLabResultsReady)
+                        {
+                            @if (userRole == Role.Patient)
+                            {
+                                <button @onclick="() => DownloadResults(examination)">Download Results</button>
+                            }
+                            else if (userRole == Role.LabSpecialist)
+                            {
+                                <button @onclick="() => UploadFiles2(examination)">Upload Results</button>
+                            }
+                        }
+                        else
+                        {
+                            <p>Results not available</p>
+                        }
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+else
+{
+    <p>No lab examinations found.</p>
+}
+
+@if (userRole == Role.LabSpecialist)
+{
+    <MudFileUpload T="IBrowserFile" Accept=".pdf" FilesChanged="ConvertFileToByteArray">
+        <ButtonTemplate>
+            <MudButton Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Filled.CloudUpload">
+                Upload Results (PDF)
+            </MudButton>
+        </ButtonTemplate>
+    </MudFileUpload>
+
+    @if (files != null)
+    {
+        <MudList>
+            @foreach (var file in files)
+            {
+                <MudListItem Icon="@Icons.Material.Filled.AttachFile">
+                    @file.Name <code>@file.Size bytes</code>
+                </MudListItem>
+            }
+        </MudList>
+    }
+}
+
+@code {
+    private ICollection<LabExamination> labExaminations;
+    private Role userRole;
+
+    private PatientExamination patientExaminations;
+    private byte[] DocumentResultPdf;
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        // Get the currently logged-in user
+        var user = await userManager.GetUserAsync((await authState.GetAuthenticationStateAsync()).User);
+
+        // Set the user's role
+        userRole = user.Role;
+
+        // Load lab examinations for the current user
+        labExaminations = await labExaminationManager.ReadAllAsync();
+    }
+
+    IList<IBrowserFile> files = new List<IBrowserFile>();
+    private async Task UploadFiles2(LabExamination examination)
+    {
+        // Assuming you have other data needed to create a PatientExamination instance
+        // For demonstration purposes, let's assume you have the patient ID
+        // Replace 'patientId' with the actual patient ID
+
+        // Iterate over the files and process each one
+        foreach (var file in files)
+        {
+            // Convert the file to byte[] using the provided method
+            byte[] fileBytes = await ConvertFileToByteArray(file);
+
+            // Update the existing PatientExamination instance with the file data
+            patientExaminations.DocumentResultPdf = fileBytes;
+            patientExaminations.AreLabResultsReady = true;
+
+            // Update the PatientExamination in the database using the PatientExaminationManager
+            await patientExamManager.UpdateAsync(patientExaminations);
+        }
+
+        // Clear the list of files after processing
+        files.Clear();
+    }
+
+    private async Task DownloadResults(LabExamination examination)
+    {
+        // Implement file download logic here
+    }
+
+    private async Task<byte[]> ConvertFileToByteArray(IBrowserFile file)
+    {
+        using var ms = new System.IO.MemoryStream();
+        await file.OpenReadStream().CopyToAsync(ms);
+        return ms.ToArray();
+    }
+}

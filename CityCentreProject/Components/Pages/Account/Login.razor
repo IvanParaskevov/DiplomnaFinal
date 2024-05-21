@@ -1,0 +1,73 @@
+﻿@page "/login"
+@using BusinessLayer;
+@using CityCentreProject.Components.Services
+@using Microsoft.AspNetCore.Authentication
+@using Microsoft.AspNetCore.Authentication.Cookies
+@using Microsoft.AspNetCore.Identity;
+@using ServiceLayer;
+@using System.Security.Claims
+@inject NavigationManager navigationManager
+@inject UserManager<User> userManager
+@inject AuthenticationStateProvider authenticationStateProvider;
+@inject IdentityManager identityManager;
+
+
+
+
+<EditForm OnValidSubmit="@Authenticate">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <MudContainer Class="login-container">
+        <MudPaper Elevation="3" Class="login-paper">
+
+
+            <MudTextField Id="name" Label="Username" Variant="Variant.Outlined" @bind-Value="username" />
+            <MudTextField Id="password" Label="Password" Variant="Variant.Outlined" InputType="InputType.Password" @bind-Value="password" />
+            <MudAlert>@errorMessage</MudAlert>
+                <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary" Class="mt-3" FullWidth="true">Login</MudButton>
+
+
+            </MudPaper>
+        </MudContainer>
+    </EditForm>
+
+
+
+    @code
+    {
+    private string username;
+    private string password;
+    private string errorMessage;
+    private StartLogin user { get; set; }
+    // private string password;
+
+    protected override Task OnInitializedAsync()
+    {
+        user = new();
+        return base.OnInitializedAsync();
+    }
+
+    private async Task Authenticate()
+    {
+        try
+        {
+           StartLogin user = await identityManager.LogInAsync2(username, password);
+            if (user == null)
+            {
+                errorMessage = "User with this name/password does not exist!";
+                return;
+            }
+
+            var customAuthStateProvider = (CustomAuthenticationStateProvider)authenticationStateProvider;
+            await customAuthStateProvider.UpdateAuthenticationState(user);
+
+            navigationManager.NavigateTo("/", true);
+        }
+        catch (Exception ex)
+        {
+            throw ex;
+        }
+    }
+}
+

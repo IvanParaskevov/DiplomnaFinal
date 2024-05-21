@@ -1,0 +1,62 @@
+﻿@page "/specialists/see"
+@using BusinessLayer;
+@using CityCentreProject.Components.Services
+@using ServiceLayer;
+@inject DoctorManager doctorManager;
+@inject StateContainer<Doctor> userContainer;
+
+<MudText Align="Align.Center"><h3>Лист от нашите доктори и специалисти</h3></MudText>
+
+<MudContainer>
+    <MudSimpleTable>
+        <thead>
+            <MudTh>Име</MudTh>
+            <MudTh>Презиме</MudTh>
+            <MudTh>Фамилия</MudTh>
+            <MudTh>Специалност</MudTh>
+            <MudTh>Етаж</MudTh>
+            <MudTh>Кабинет</MudTh>
+            <MudTh>Снимка</MudTh>
+        </thead>
+        <tbody>
+            @if (Doctors == null)
+            {
+                <tr><td colspan="7">Loading...</td></tr>
+            }
+            else
+            {
+                @foreach (Doctor item in Doctors)
+                {
+                    <MudTr>
+                        <MudTd>@item.FirstName</MudTd>
+                            <MudTd>@item.SecondName</MudTd>
+                            <MudTd>@item.LastName</MudTd>
+                            <MudTd>@item.DoctorSpecialty.ToString()</MudTd>
+                            <MudTd>@item.DoctorFloor</MudTd>
+                            <MudTd>@item.DoctorRoom</MudTd>
+                            <MudTd>
+                                @if (item.ProfilePic != null)
+                            {
+                                <a src="data:image;base64, @System.Convert.ToBase64String(item.ProfilePic)" class="img-thumbnail" style="max-width: 100px; max-height: 100px;" />
+                            }
+                        </MudTd>
+                    </MudTr>
+                }
+            }
+        </tbody>
+    </MudSimpleTable>
+</MudContainer>
+
+
+
+@code {
+
+    private List<Doctor> Doctors;
+
+    protected override async Task OnInitializedAsync()
+    {
+        // Retrieve doctors from the database
+        Doctors = await doctorManager.ReadAllAsync();
+    }
+
+}

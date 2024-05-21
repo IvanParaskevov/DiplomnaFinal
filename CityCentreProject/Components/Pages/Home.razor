@@ -1,0 +1,111 @@
+﻿@page "/"
+
+<MudContainer>
+
+
+    <!-- Main content -->
+    <div class="main-content">
+        <div class="hero-section">
+            <MudText Typo="Typo.h2" Class="hero-heading">Welcome to Medical Centre</MudText>
+            <MudText Typo="Typo.subtitle1" Class="hero-subtitle">Providing Quality Healthcare Services</MudText>
+        </div>
+
+        <div class="about-section">
+            <MudText Typo="Typo.h5" Class="about-heading">About Us</MudText>
+            <MudText Typo="Typo.body2" Class="about-text">
+                Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed aliquam nunc ut diam scelerisque, nec interdum turpis fringilla.
+            </MudText>
+        </div>
+
+        <div class="services-section">
+            <MudText Typo="Typo.h5" Class="services-heading">Our Services</MudText>
+            <div class="service-items">
+                <div class="service-item">
+                    <MudIcon Icon="Icons.MedicalServices" Class="service-icon" />
+                    <span class="service-name">General Medicine</span>
+                </div>
+                <div class="service-item">
+                    <MudIcon Icon="Icons.DentalServices" Class="service-icon" />
+                    <span class="service-name">Dental Care</span>
+                </div>
+                <div class="service-item">
+                    <MudIcon Icon="Icons.EyeCare" Class="service-icon" />
+                    <span class="service-name">Eye Care</span>
+                </div>
+                <!-- Add more services as needed -->
+            </div>
+        </div>
+    </div>
+</MudContainer>
+
+<style>
+    .toolbar-content {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .logo {
+        font-size: 24px;
+        font-weight: bold;
+    }
+
+    .main-content {
+        padding: 32px;
+        text-align: center;
+    }
+
+    .hero-section {
+        margin-bottom: 64px;
+    }
+
+    .hero-heading {
+        margin-bottom: 16px;
+        font-weight: bold;
+        color: #007bff; /* Change color to match your branding */
+    }
+
+    .hero-subtitle {
+        color: #6c757d; /* Change color to match your branding */
+    }
+
+    .about-section {
+        margin-bottom: 64px;
+    }
+
+    .about-heading {
+        margin-bottom: 16px;
+        font-weight: bold;
+    }
+
+    .services-section {
+        margin-bottom: 64px;
+    }
+
+    .services-heading {
+        margin-bottom: 16px;
+        font-weight: bold;
+    }
+
+    .service-items {
+        display: flex;
+        justify-content: center;
+        gap: 32px;
+    }
+
+    .service-item {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .service-icon {
+        font-size: 48px;
+        color: #28a745; /* Change color to match your branding */
+    }
+
+    .service-name {
+        margin-top: 8px;
+        font-size: 16px;
+    }
+</style>

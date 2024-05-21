@@ -1,0 +1,114 @@
+﻿@page "/patients"
+@using BusinessLayer
+@using CityCentreProject.Components.Services
+@using ServiceLayer
+@inject PatientManager patientManager
+@inject StateContainer<Patient> patientContainer;
+
+<MudContainer>
+	<MudCardContent>
+		<MudText>Списък на пациенти</MudText>
+	</MudCardContent>
+</MudContainer>
+
+
+
+<MudContainer>
+	<MudGrid Justify="Justify.Center">
+		<MudItem>
+			<MudNavLink Href="/">Назад </MudNavLink>
+		</MudItem>
+	</MudGrid>
+</MudContainer>
+
+<MudContainer>
+	<div style="display: flex; justify-content: space-between;">
+		<MudLink Href="patients/create">Създай нов пациент</MudLink>
+		
+	</div>
+	<MudSimpleTable class="table" Hover="true" Dense="true" Bordered="@bordered"  FixedHeader="@fixedheader" Style="@(fixedheader?"height:300px;":"")">
+		<thead>
+			<tr>
+				@foreach (var h in headings)
+				{
+					<th>@h</th>
+				}
+			</tr>
+		</thead>
+		<tbody>
+			@if (patients == null)
+			{
+				<tr><td>Зареждане...</td></tr>
+			}
+			else
+			{
+				@foreach (Patient item in patients)
+				{
+					<tr>
+						<td class="center">
+							@item.FirstName
+						</td>
+						<td>
+							@item.SecondName
+						</td class="center">
+						<td>
+							@item.LastName
+						</td>
+						<td class="center">
+							@item.PhoneNumber
+						</td>
+						<td class="center">
+							@item.UserName
+						</td>
+						<td class="center">
+							@item.Email
+						</td>
+						
+						<td class="center">
+							<MudLink href="patients/edit" @onclick="(() => SetGroup(item))">Промени</MudLink> |
+							<MudLink href="patients/delete" @onclick="(() => SetGroup(item))">Изтрий</MudLink>
+						</td>
+					</tr>
+				}
+			}
+		</tbody>
+
+	</MudSimpleTable>
+</MudContainer>
+
+@code {
+
+	bool fixedheader = true;
+	private bool bordered = true;
+
+    string[] headings = { "Име", "Презиме", "Фамилия", "Телефон", "Потребителско име", "Имейл" };
+
+    ICollection<Patient> patients;
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadGroups();
+    }
+
+    async Task LoadGroups()
+    {
+        patients = await patientManager.ReadAllAsync(true, false);
+    }
+
+    void SetGroup(Patient patient)
+    {
+        patientContainer.SetValue(patient);
+    }
+
+    async Task OnDelete(string id)
+    {
+        try
+        {
+            await patientManager.DeleteAsync(id);
+            await LoadGroups();
+        }
+        catch (Exception)
+        {
+            throw;
+        }
+    }
+}

@@ -1,0 +1,55 @@
+﻿@page "/labExaminations/edit"
+@using BusinessLayer
+@using CityCentreProject.Components.Services
+@using ServiceLayer
+@inject DoctorManager doctorManager
+@inject StateContainer<Doctor> doctorContainer
+@inject NavigationManager NavigationManager
+
+
+<h3>Промени изследване</h3>
+
+@if (doctor != null)
+{
+    <EditForm Model="@doctor" OnValidSubmit="UpdateDoctor">
+        <DataAnnotationsValidator />
+        <ValidationSummary />
+
+        <label>Име:</label>
+        <InputText @bind-Value="doctor.UserName" /><br />
+
+        <button type="submit">Save Changes</button>
+    </EditForm>
+}
+else
+{
+    <p>Изследването не е намерено.</p>
+}
+
+<button @onclick="GoBack">Назад</button>
+
+
+
+
+@code {
+
+
+    private Doctor doctor;
+
+    protected override async Task OnInitializedAsync()
+    {
+        doctor = doctorContainer.Value;
+        await base.OnInitializedAsync();
+    }
+
+    private async Task UpdateDoctor()
+    {
+        await doctorManager.UpdateAsync(doctor);
+        NavigationManager.NavigateTo("/doctors");
+    }
+
+    private void GoBack()
+    {
+        NavigationManager.NavigateTo("/doctors");
+    }
+}

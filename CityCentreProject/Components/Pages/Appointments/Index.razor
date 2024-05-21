@@ -1,0 +1,72 @@
+﻿@page "/appointments"
+@using BusinessLayer
+@using CityCentreProject.Components.Services
+@using ServiceLayer
+@inject AppointmentManager appointmentManager
+@inject StateContainer<Appointment> appointmentContainer;
+
+<MudContainer>
+    <MudItem><h3>Лист със срещи</h3></MudItem>
+
+    @if (appointments != null && appointments.Any())
+    {
+        <MudPaper Elevation="3" Class="table-container">
+            <MudTable T="ICollection<Appointment>" Class="centered-table">
+                <thead>
+                    <MudTr>
+                        <MudTh>Причина</MudTh>
+                        <MudTh>Описание</MudTh>
+                        <MudTh>Дата</MudTh>
+                        <MudTh>Час</MudTh>
+                    </MudTr>
+                </thead>
+                <tbody>
+                    @foreach (var appointment in appointments)
+                    {
+                        <MudTr>
+                            <MudTd>@appointment.Reason.ToString()</MudTd>
+                                <MudTd>@appointment.Description</MudTd>
+                                <MudTd>@appointment.Date</MudTd>
+                                <MudTd>@appointment.StartTime</MudTd>
+                            </MudTr>
+                    }
+                </tbody>
+            </MudTable>
+        </MudPaper>
+    }
+    else
+    {
+        <p>Няма намерени срещи.</p>
+    }
+</MudContainer>
+
+@code {
+    ICollection<Appointment> appointments;
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadGroups();
+    }
+
+    async Task LoadGroups()
+    {
+        appointments = await appointmentManager.ReadAllAsync(true, false);
+    }
+
+    void SetGroup(Appointment appointment)
+    {
+        appointmentContainer.SetValue(appointment);
+    }
+
+    async Task OnDelete(int id)
+    {
+        try
+        {
+            await appointmentManager.DeleteAsync(id);
+            await LoadGroups();
+        }
+        catch (Exception)
+        {
+            throw;
+        }
+    }
+}

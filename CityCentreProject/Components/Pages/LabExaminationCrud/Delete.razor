@@ -1,0 +1,44 @@
+﻿@page "/labExaminations/delete"
+@using BusinessLayer
+@using CityCentreProject.Components.Services
+@using ServiceLayer
+@inject DoctorManager doctorManager
+@inject StateContainer<Doctor> doctorContainer
+@inject NavigationManager NavigationManager
+
+<h3>Delete Doctor</h3>
+
+@if (doctor != null)
+{
+    <p>Are you sure you want to delete @doctor.UserName?</p>
+    <button @onclick="DeleteDoctor">Yes</button>
+    <button @onclick="GoBack">No</button>
+}
+else
+{
+    <p>Doctor not found.</p>
+}
+
+@code {
+
+
+
+    private Doctor doctor;
+
+    protected override async Task OnInitializedAsync()
+    {
+        doctor = doctorContainer.Value;
+        await base.OnInitializedAsync();
+    }
+
+    private async Task DeleteDoctor()
+    {
+        await doctorManager.DeleteAsync(doctor.Id);
+        NavigationManager.NavigateTo("/doctors");
+    }
+
+    private void GoBack()
+    {
+        NavigationManager.NavigateTo("/doctors");
+    }
+}

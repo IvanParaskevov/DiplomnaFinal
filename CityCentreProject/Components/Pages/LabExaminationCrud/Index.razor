@@ -1,0 +1,53 @@
+﻿@page "/labExaminations"
+@using BusinessLayer
+@using CityCentreProject.Components.Services
+@using ServiceLayer
+@inject DoctorManager doctorManager
+@inject StateContainer<Doctor> doctorContainer;
+
+<h3>Doctor List</h3>
+
+@if (doctors != null && doctors.Any())
+{
+    <ul>
+        @foreach (var doctor in doctors)
+        {
+            <li>@doctor.UserName</li>
+        }
+    </ul>
+}
+else
+{
+    <p>No doctors found.</p>
+}
+
+@code {
+    ICollection<Doctor> doctors;
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadGroups();
+    }
+
+    async Task LoadGroups()
+    {
+        doctors = await doctorManager.ReadAllAsync(true, false);
+    }
+
+    void SetGroup(Doctor doctor)
+    {
+        doctorContainer.SetValue(doctor);
+    }
+
+    async Task OnDelete(int id)
+    {
+        try
+        {
+            await doctorManager.DeleteAsync(id.ToString());
+            await LoadGroups();
+        }
+        catch (Exception)
+        {
+            throw;
+        }
+    }
+}

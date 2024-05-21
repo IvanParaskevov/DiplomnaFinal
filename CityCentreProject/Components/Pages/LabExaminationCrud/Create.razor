@@ -1,0 +1,98 @@
+﻿@page "/labExaminations/create"
+@using BusinessLayer
+@using ServiceLayer
+@inject PatientManager patientManager
+@inject LabExaminationManager labExaminationManager
+@inject NavigationManager navigationManager
+@inject PatientExaminationManager patientExaminationManager
+
+<h3>Available Lab Examinations:</h3>
+
+@foreach (var examination in examinations)
+{
+    <div>
+        <h4>@examination.Description</h4>
+        <p>Price: @examination.Price</p>
+        <p>Days for Results: @examination.Days</p>
+        <button @onclick="() => RegisterForExamination(examination)">Register for Examination</button>
+    </div>
+}
+
+@if (showPopup)
+{
+    <div class="popup">
+        <h4>Registration Successful!</h4>
+        <p>Patient ID: @patientId</p>
+        <p>Password: @password</p>
+        <button @onclick="ClosePopup">Close</button>
+    </div>
+}
+
+@code {
+    private ICollection<LabExamination> examinations = new List<LabExamination>();
+    private bool showPopup = false;
+    private string patientId;
+    private string password;
+
+    protected override async Task OnInitializedAsync()
+    {
+        examinations = await labExaminationManager.ReadAllAsync();
+    }
+
+    private async Task RegisterForExamination(LabExamination examination)
+    {
+        // Generate unique ID and password
+        var patientId = Guid.NewGuid().ToString().Substring(0, 8); // Generate unique ID
+        var password = Guid.NewGuid().ToString().Substring(0, 8); // Generate random password
+
+        // Get the current patient (you need to implement this based on your application logic)
+        var patient = await GetCurrentPatient();
+
+        // Save patient examination record to the database
+        /*await patientExaminationManager.CreateAsync(new PatientExamination(
+            patientId,
+            password,
+            patient.Id,
+            examination.Id,
+           // doc=null,
+
+
+        ));*/
+
+        // Show popup with generated ID and password
+        ShowPopup(patientId, password);
+    }
+
+
+    private async Task<Patient> GetCurrentPatient()
+    {
+        // Implement your logic to retrieve the current patient
+        // For demonstration purposes, I'll return the first patient from the database
+        var patients = await patientManager.ReadAllAsync();
+        return patients.FirstOrDefault();
+    }
+
+    private void ShowPopup(string patientId, string password)
+    {
+        // Show popup with generated ID and password
+        showPopup = true;
+        this.patientId = patientId;
+        this.password = password;
+    }
+
+    private void ClosePopup()
+    {
+        // Hide popup
+        showPopup = false;
+
+        // Clear generated ID and password
+        patientId = null;
+        password = null;
+
+
+        // Redirect to home page
+        navigationManager.NavigateTo("/");
+    }
+
+
+}

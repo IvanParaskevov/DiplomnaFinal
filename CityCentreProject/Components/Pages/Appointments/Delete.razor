@@ -1,0 +1,46 @@
+﻿@page "/appointments/delete"
+@using BusinessLayer
+@using CityCentreProject.Components.Services
+@using ServiceLayer
+@inject AppointmentManager appointmentManager
+@inject StateContainer<Appointment> appointmentContainer
+@inject NavigationManager NavigationManager
+
+<h3>Изтрий запис</h3>
+
+@if (appointment != null)
+{
+    <MudContainer>
+        <MudPaper>Are you sure you want to delete @appointment.Reason?</MudPaper>
+            <MudButton @onclick="DeleteAppointment">Да</MudButton>
+            <MudButton @onclick="GoBack">Не</MudButton>
+        </MudContainer>
+}
+else
+{
+    <MudPaper>Записът не е намерен</MudPaper>
+}
+
+@code {
+
+
+
+    private Appointment appointment;
+
+    protected override async Task OnInitializedAsync()
+    {
+        appointment = appointmentContainer.Value;
+        await base.OnInitializedAsync();
+    }
+
+    private async Task DeleteAppointment()
+    {
+        await appointmentManager.DeleteAsync(appointment.Id);
+        NavigationManager.NavigateTo("/appointments");
+    }
+
+    private void GoBack()
+    {
+        NavigationManager.NavigateTo("/appointments");
+    }
+}

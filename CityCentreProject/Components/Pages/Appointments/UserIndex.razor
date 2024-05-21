@@ -1,0 +1,123 @@
+﻿@page "/userIndex"
+@using BusinessLayer
+@using CityCentreProject.Components.Services
+@using ServiceLayer
+@rendermode InteractiveServer
+@inject DoctorManager doctorManager
+@inject PatientManager patientManager
+@inject StateContainer<Doctor> doctorContainer;
+@inject StateContainer<Patient> patientContainer;
+<MudContainer>
+	<MudCardContent>
+		<MudText>Списък на специалисти</MudText>
+	</MudCardContent>
+</MudContainer>
+
+
+
+<MudContainer>
+	<MudGrid Justify="Justify.Center">
+		<MudItem>
+			<MudNavLink Href="/">Назад </MudNavLink>
+		</MudItem>
+	</MudGrid>
+</MudContainer>
+
+<MudContainer>
+	<MudSimpleTable class="table" Hover="true" Dense="true" Bordered="@bordered"  FixedHeader="@fixedheader" Style="@(fixedheader?"height:300px;":"")">
+		<thead>
+			<tr>
+				@foreach (var h in headings)
+				{
+					<th>@h</th>
+				}
+			</tr>
+		</thead>
+		<tbody>
+			@if (doctors == null)
+			{
+				<tr><td>Зареждане...</td></tr>
+			}
+			else
+			{
+				@foreach (Doctor item in doctors)
+				{
+					<tr>
+						<td class="center">
+							@item.FirstName
+						</td>
+						<td>
+							@item.SecondName
+						</td class="center">
+						<td>
+							@item.LastName
+						</td>
+						<td class="center">
+							@item.DoctorSpecialty.ToString()
+						</td>
+						<td class="center">
+							@item.DoctorFloor
+						</td>
+						<td class="center">
+							@item.DoctorRoom
+						</td>
+						<td class="center">
+							@if (item.ProfilePic != null)
+							{
+								<img src="data:image;base64, @System.Convert.ToBase64String(item.ProfilePic)" />
+							}
+							
+						</td>
+						<td class="center">
+							<MudLink href="appointments/create" @onclick="(() => SetDoctor(item))">Запиши</MudLink> 
+							
+						</td>
+					</tr>
+				}
+			}
+		</tbody>
+
+	</MudSimpleTable>
+</MudContainer>
+
+
+@code {
+	bool fixedheader = true;
+	private bool bordered = true;
+
+	string[] headings = { "Име", "Презиме", "Фамилия", "Специалност", "Етаж", "Стая", "Профилна снимка" };
+
+	ICollection<Doctor> doctors;
+	ICollection<Patient> patients;
+
+	protected override async Task OnInitializedAsync()
+	{
+		await LoadDoctorsAndPatients();
+	}
+
+	async Task LoadDoctorsAndPatients()
+	{
+		doctors = await doctorManager.ReadAllAsync(true, false);
+		patients = await patientManager.ReadAllAsync(true, false);
+	}
+
+	void SetDoctor(Doctor doctor)
+	{
+		doctorContainer.SetValue(doctor);
+	}
+
+	
+
+  /*  async Task OnDelete(string id)
+    {
+        try
+        {
+            await doctorManager.DeleteAsync(id);
+            await LoadGroups();
+        }
+        catch (Exception)
+        {
+            throw;
+        }
+    }*/
+}

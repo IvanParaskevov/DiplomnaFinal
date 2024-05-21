@@ -1,0 +1,37 @@
+﻿@page "/appointments/details"
+@using BusinessLayer
+@using ServiceLayer
+@inject AppointmentManager appointmentManager
+@inject NavigationManager NavigationManager
+
+<h3>Appointment Details</h3>
+<MudContainer>
+    @if (appointment != null)
+    {
+        <MudText>Причина: @appointment.Reason</MudText>
+        <MudText>Описание: @appointment.Description</MudText>
+        <MudText>Дата: @appointment.Date</MudText>
+        <MudText>Време: @appointment.StartTime</MudText>
+
+    }
+    else
+    {
+        <MudText>Няма такъв запис</MudText>
+    }
+
+    <MudButton @onclick="GoBack">Назад</MudButton>
+</MudContainer>
+@code {
+
+    private Appointment appointment;
+
+    protected override async Task OnInitializedAsync()
+    {
+        appointment = await appointmentManager.ReadAsync(appointment.Id, true);
+    }
+
+    private void GoBack()
+    {
+        NavigationManager.NavigateTo("/appointments");
+    }
+}

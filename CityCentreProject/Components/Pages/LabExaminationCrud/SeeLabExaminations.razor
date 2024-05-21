@@ -1,0 +1,76 @@
+﻿@page "/labExaminations/see"
+@using BusinessLayer;
+@using CityCentreProject.Components.Services
+@using ServiceLayer;
+@inject LabExaminationManager labExaminationManager;
+@inject StateContainer<LabExamination> labExaminationContainer;
+
+<MudText Align="Align.Center"><h3>Списък от предлагани изследвания и цени</h3></MudText>
+
+<MudContainer>
+    <MudSimpleTable class="table">
+        <thead>
+            <MudTr>
+                <MudTh>
+                    Вид
+                </MudTh>
+                <th></th>
+                <MudTh>
+                    Описание
+                </MudTh>
+                <th></th>
+                <MudTh>
+                    Нужни дни
+                </MudTh>
+                <th></th>
+
+                <MudTh>
+                    Цена
+                </MudTh>
+                <th></th>
+
+
+            </MudTr>
+        </thead>
+        <tbody>
+            @if (LabExaminations == null)
+            {
+                <MudTr><MudTd>Loading...</MudTd></MudTr>
+            }
+            else
+            {
+                @foreach (LabExamination item in LabExaminations)
+                {
+                    <MudTr>
+                        <MudTd>
+                            @item.Type.ToString()
+                        </MudTd>
+                        <MudTd>
+                            @item.Description
+                        </MudTd>
+                        <MudTd>
+                            @item.Days
+                        </MudTd>
+                        <MudTd>
+                            @item.Price
+                        </MudTd>
+
+                    </MudTr>
+                }
+            }
+        </tbody>
+    </MudSimpleTable>
+</MudContainer>
+
+
+@code {
+
+    private ICollection<LabExamination> LabExaminations;
+
+    protected override async Task OnInitializedAsync()
+    {
+
+        LabExaminations = await labExaminationManager.ReadAllAsync();
+    }
+
+}

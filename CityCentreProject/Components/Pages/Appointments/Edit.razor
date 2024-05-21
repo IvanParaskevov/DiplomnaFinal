@@ -1,0 +1,50 @@
+﻿@page "/appointments/edit"
+@using BusinessLayer
+@using CityCentreProject.Components.Services
+@using ServiceLayer
+@inject AppointmentManager appointmentManager
+@inject StateContainer<Appointment> appointmentContainer
+@inject NavigationManager NavigationManager
+
+<h3>Промени запис</h3>
+
+@if (appointment != null)
+{
+    <EditForm Model="@appointment" OnValidSubmit="UpdateAppointment">
+        <DataAnnotationsValidator />
+        <ValidationSummary />
+
+        <label>Описание:</label>
+        <InputText @bind-Value="appointment.Description" /><br />
+
+        <button type="submit">Запази промени</button>
+    </EditForm>
+}
+else
+{
+    <p>Записът не е намерен.</p>
+}
+
+<button @onclick="GoBack">Назад</button>
+
+@code {
+
+    private Appointment appointment;
+
+    protected override async Task OnInitializedAsync()
+    {
+        appointment = appointmentContainer.Value;
+        await base.OnInitializedAsync();
+    }
+
+    private async Task UpdateAppointment()
+    {
+        await appointmentManager.UpdateAsync(appointment);
+        NavigationManager.NavigateTo("/appointments");
+    }
+
+    private void GoBack()
+    {
+        NavigationManager.NavigateTo("/appointments");
+    }
+}

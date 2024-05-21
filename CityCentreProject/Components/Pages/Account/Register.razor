@@ -1,0 +1,119 @@
+﻿@page "/register"
+@using BusinessLayer;
+@using Microsoft.AspNetCore.Identity;
+@using Microsoft.AspNetCore.Identity.EntityFrameworkCore
+@using ServiceLayer;
+@using MudBlazor.Services
+@using MudBlazor.Interop
+@using System.Diagnostics
+@using System.Text.RegularExpressions
+@using System.ComponentModel.DataAnnotations
+@inject SignInManager<User> signInManager
+@inject UserManager<User> userManager;
+@inject IdentityManager identityManager;
+@inject NavigationManager navigationManager;
+
+
+
+
+<EditForm Model="@Model" OnValidSubmit="@RegisterUser">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <MudContainer Class="register-container">
+        <MudPaper Elevation="3" Class="register-paper">
+            <h3>Регистрация на потребител</h3>
+
+            <MudTextField Id="fname" Label="Име" Variant="Variant.Outlined" InputType="InputType.Text" @bind-Value="Model.FirstName" />
+            <MudTextField Id="secname" Label="Презиме" Variant="Variant.Outlined" InputType="InputType.Text" @bind-Value="Model.SecondName" />
+            <MudTextField Id="lname" Label="Фамилия" Variant="Variant.Outlined" InputType="InputType.Text" @bind-Value="Model.LastName" />
+            <MudDatePicker id="birthdate" Label="Рождена дата" MaxDate="@DateTime.Today" ShowWeekNumbers="true" DateFormat="dd.MM.yyyy" @bind-DateTime="Model.Birthdate" />
+            <MudTextField Id="username" Label="Потребителско име" Variant="Variant.Outlined" InputType="InputType.Text" @bind-Value="Model.UserName" />
+            <MudTextField Id="email" Label="Имейл" Variant="Variant.Outlined" InputType="InputType.Email" @bind-Value="Model.Email" />
+            <MudTextField Id="pass" Label="Парола" Variant="Variant.Outlined" InputType="InputType.Password" @bind-Value="password" />
+            <MudTextField Id="pass" Label="Потвърдете паролата" Variant="Variant.Outlined" InputType="InputType.Password" @bind-Value="confirmpassword" />
+            <MudTextField Id="phone" Label="Телефонен номер" Variant="Variant.Outlined" InputType="InputType.Telephone" MaxLength="10" @bind-Value="Model.PhoneNumber" />
+            <MudAlert>@errorMessage</MudAlert>
+                <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary" Class="mt-3" FullWidth="true">Register</MudButton>
+
+
+            </MudPaper>
+        </MudContainer>
+    </EditForm>
+
+
+
+
+
+    @code
+    {
+
+    private User Model = new();
+
+    private string errorMessage = "";
+    private string password, confirmpassword;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+    }
+
+    private async Task RegisterUser()
+    {
+
+        try
+        {
+            Console.WriteLine("RegisterUser метод се обажда.");
+
+            if (string.IsNullOrWhiteSpace(Model.FirstName) ||
+                string.IsNullOrWhiteSpace(Model.SecondName) ||
+                string.IsNullOrWhiteSpace(Model.LastName) ||
+                string.IsNullOrWhiteSpace(Model.UserName) ||
+                string.IsNullOrWhiteSpace(Model.Email) ||
+                string.IsNullOrWhiteSpace(password) ||
+                string.IsNullOrWhiteSpace(confirmpassword) ||
+                string.IsNullOrWhiteSpace(Model.PhoneNumber))
+            {
+                errorMessage = "Моля попълнете всички нужни полета.";
+
+                return;
+            }
+
+            if (password != confirmpassword)
+            {
+                errorMessage = "Паролите не съвпадат.";
+                return;
+            }
+            if (Model.Birthdate.AddYears(18) > DateTime.Today)
+            {
+                errorMessage = "Трябва да сте на поне 18 години за регистрация.";
+                return;
+            }
+
+
+            Model.Role = Role.Patient;
+            Model.PasswordHash = userManager.PasswordHasher.HashPassword(Model, password);
+            await identityManager.CreateUserAsync(Model);
+
+            // await identityManager.UpdateAsync(Model);
+
+            navigationManager.NavigateTo("/", false);
+
+        }
+        catch
+        {
+            errorMessage = "Грешка. Опитайте отново.";
+            return;
+        }
+
+
+
+
+    }
+}
+
+
+
+
+
+

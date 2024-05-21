@@ -1,0 +1,204 @@
+﻿@page "/doctors/createDoctor"
+@using Microsoft.AspNetCore.Authorization
+@using Microsoft.AspNetCore.Identity;
+@using MudBlazor;
+@using BusinessLayer;
+@using ServiceLayer;
+@using MudBlazor.Services;
+@inject NavigationManager navigationManager;
+@inject DoctorManager doctorManager;
+@inject IdentityManager identityManager;
+
+<h1>Създай доктор</h1>
+
+<h4>Доктор:</h4>
+<hr />
+<MudContainer>
+    <div class="row">
+        <div class="col-md-4">
+            <MudForm Model="Model">
+                <div class="form-group">
+                    <MudTextField @bind-Value="Model.FirstName"
+                                  T="string" class="form-control"
+                                  Label="Име"
+                                  Variant="Variant.Outlined"
+                                  For="@( () => Model.FirstName )" />
+                </div>
+                <div class="form-group">
+                    <MudTextField @bind-Value="Model.SecondName"
+                                  T="string" class="form-control"
+                                  Label="Презиме"
+                                  Variant="Variant.Outlined"
+                                  For="@( () => Model.SecondName )" />
+                </div>
+                <div class="form-group">
+                    <MudTextField @bind-Value="Model.LastName"
+                                  T="string" class="form-control"
+                                  Label="Фамилия"
+                                  Variant="Variant.Outlined"
+                                  For="@( () => Model.LastName )" />
+                </div>
+                <div class="form-group">
+                    <MudTextField @bind-Value="Model.UserName"
+                                  T="string" class="form-control"
+                                  Label="Потребителско име"
+                                  Variant="Variant.Outlined"
+                                  For="@( () => Model.UserName )" />
+                </div>
+                <div class="form-group">
+                    <MudTextField @bind-Value="Model.Email"
+                                  T="string" class="form-control"
+                                  Label="Имейл"
+                                  Variant="Variant.Outlined"
+                                  For="@( () => Model.Email )" />
+                </div>
+                <div class="form-group">
+                    <MudTextField @bind-Value="password"
+                                  T="string" type="password" class="form-control"
+                                  Label="Парола"
+                                  Variant="Variant.Outlined"
+                                  For="@( () => password )" />
+                </div>
+                <div class="form-group">
+                    <MudTextField @bind-Value="confirmPassword"
+                                  T="string" type="password" class="form-control"
+                                  Label="Потвърди парола"
+                                  Variant="Variant.Outlined"
+                                  For="@( () => confirmPassword )" />
+                </div>
+                <div class="form-group">
+                    <MudDatePicker @bind-Value="Model.Birthdate"
+                                   T="DateTime" class="form-control"
+                                   Label="Рождена дата"
+                                   Variant="Variant.Outlined"
+                                   For="@( () => Model.Birthdate )" />
+                </div>
+                <div class="form-group">
+                    <MudTextField @bind-Value="Model.DoctorFloor"
+                                  T="int" class="form-control"
+                                  Label="Етаж"
+                                  Variant="Variant.Outlined"
+                                  For="@( () => Model.DoctorFloor )" />
+                </div>
+                <div class="form-group">
+                    <MudTextField @bind-Value="Model.DoctorRoom"
+                                  T="int" class="form-control"
+                                  Label="Стая"
+                                  Variant="Variant.Outlined"
+                                  For="@( () => Model.DoctorRoom )" />
+                </div>
+
+                <div>
+                    <MudItem>
+                        <MudSelect Label="Специалност" @bind-Value="@Model.DoctorSpecialty">
+                            @foreach (Specialty specialty in Enum.GetValues(typeof(Specialty)))
+                            {
+                                <MudSelectItem Value="@specialty">@specialty.ToString()</MudSelectItem>
+                            }
+                        </MudSelect>
+                    </MudItem>
+                </div>
+                <div class="form-group">
+                    <MudTextField @bind-Value="Model.PhoneNumber"
+                                  T="string" class="form-control"
+                                  Label="Телефонен номер"
+                                  Variant="Variant.Outlined"
+                                  For="@( () => Model.PhoneNumber )" />
+                </div>
+
+                @if (Model.ProfilePic != null)
+                {
+                    <img src="data:image;base64, @System.Convert.ToBase64String(Model.ProfilePic)" />
+                }
+
+                <MudFileUpload T="IBrowserFile" FilesChanged="UploadFiles">
+                    <ButtonTemplate>
+                        <MudFab HtmlTag="label"
+                                Color="Color.Secondary"
+                                StartIcon="@Icons.Material.Filled.Image"
+                                Label="Load picture"
+                                for="@context.Id" />
+                    </ButtonTemplate>
+                </MudFileUpload>
+
+                <MudAlert>
+                    @errorMessage
+                </MudAlert>
+
+                <div class="form-group">
+                    <MudButton Variant="Variant.Filled"
+                               StartIcon="@Icons.Material.Filled.Save"
+                               IconColor="Color.Primary"
+                               Size="Size.Large"
+                               OnClick="CreateUser">Създай</MudButton>
+                </div>
+            </MudForm>
+        </div>
+    </div>
+</MudContainer>
+<div class="form-group">
+    <MudButton Variant="Variant.Filled"
+               IconColor="Color.Secondary"
+               Size="Size.Large"
+               Href="doctors">Назад</MudButton>
+</div>
+
+@code {
+    private Doctor Model = new();
+    private string errorMessage;
+    private string password, confirmPassword;
+
+
+
+    private async Task UploadFiles(IBrowserFile uploadedFile)
+    {
+
+        await using var memoryStream = new MemoryStream();
+        await uploadedFile.OpenReadStream().CopyToAsync(memoryStream);
+        Model.ProfilePic = memoryStream.ToArray();
+
+    }
+
+    private async Task CreateUser()
+    {
+        try
+        {
+            if (string.IsNullOrWhiteSpace(Model.FirstName) ||
+            string.IsNullOrWhiteSpace(Model.SecondName) ||
+            string.IsNullOrWhiteSpace(Model.LastName) ||
+            string.IsNullOrWhiteSpace(Model.UserName) ||
+            string.IsNullOrWhiteSpace(Model.Email) ||
+            string.IsNullOrWhiteSpace(password) ||
+            string.IsNullOrWhiteSpace(confirmPassword) ||
+            string.IsNullOrWhiteSpace(Model.PhoneNumber))
+            {
+                errorMessage = "Please fill in all required fields.";
+                return;
+            }
+
+            if (password != confirmPassword)
+            {
+                errorMessage = "Passwords do not match.";
+                return;
+            }
+            if (Model.Birthdate.AddYears(18) > DateTime.Today)
+            {
+                errorMessage = "You must be at least 18 years old to register.";
+                return;
+            }
+            Model.Role = Role.Doctor;
+            Model.PasswordHash = password;
+            await doctorManager.CreateAsync(Model);
+            navigationManager.NavigateTo("/doctors", true);
+
+        }
+        catch
+        {
+            errorMessage = "Registration failed. Please try again.";
+            return;
+        }
+
+
+    }
+}
+

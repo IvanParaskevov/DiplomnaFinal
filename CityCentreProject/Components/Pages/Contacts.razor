@@ -1,0 +1,84 @@
+﻿@page "/contacts"
+
+<MudContainer>
+    <MudPaper Class="p-4">
+        <MudText Typo="Typo.h4" Class="mb-4">Свържете се с нас!</MudText>
+
+        <div class="contact-info">
+            <div class="contact-info-item">
+                <div class="contact-icon">
+                    <MudIcon Icon="Icons.LocationOn" Class="icon" />
+                </div>
+                <div>
+                    <strong>Медицински център "City Centre"</strong><br />
+                    Адрес: гр. Пловдив, ул.Листова №12
+                </div>
+            </div>
+
+            <div class="contact-info-item">
+                <div class="contact-icon">
+                    <MudIcon Icon="Icons.Phone" Class="icon" />
+                </div>
+                <div>
+                    Телефон за връзка: +123 456 789
+                </div>
+            </div>
+
+            <div class="contact-info-item">
+                <div class="contact-icon">
+                    <MudIcon Icon="Icons.Email" Class="icon" />
+                </div>
+                <div>
+                    Имейл: info@medicalcentre.com
+                </div>
+            </div>
+        </div>
+
+        <div class="map-container">
+            <!-- Replace the iframe src attribute with the embed code for your location -->
+            <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2934.481009154477!2d24.75012311480736!3d42.13540722148045!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x14aaceeebe9c146b%3A0x400f42fb1982860!2sPlovdiv%2C%20Bulgaria!5e0!3m2!1sen!2sus!4v1649995202221!5m2!1sen!2sus" width="600" height="450" style="border:0;" allowfullscreen="" loading="lazy"></iframe>
+        </div>
+    </MudPaper>
+</MudContainer>
+
+<style>
+    .contact-info {
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+        margin-bottom: 32px;
+    }
+
+    .contact-info-item {
+        display: flex;
+        align-items: center;
+    }
+
+    .contact-icon {
+        margin-right: 16px;
+    }
+
+    .icon {
+        font-size: 24px;
+    }
+
+    .map-container {
+        margin-top: 32px;
+        overflow: hidden;
+        position: relative;
+        padding-top: 56.25%; /* 16:9 aspect ratio */
+    }
+
+        .map-container iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border: 0;
+        }
+</style>
+
+@code {
+
+}

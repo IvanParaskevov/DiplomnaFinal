@@ -1,0 +1,89 @@
+﻿@page "/aboutUs"
+
+<MudContainer>
+    <!-- Main content -->
+    <div class="main-content">
+        <div class="about-section">
+            <MudText Typo="Typo.h4" Class="about-heading">About Us</MudText>
+            <MudText Typo="Typo.body1" Class="about-text">
+                Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed aliquam nunc ut diam scelerisque, nec interdum turpis fringilla.
+                Nulla quis ex sed lacus convallis hendrerit vel nec justo. Maecenas viverra ultrices odio, eget suscipit elit posuere ac.
+                Phasellus malesuada ligula vel libero vehicula tincidunt. Fusce efficitur erat nec sem consequat, id faucibus quam auctor.
+            </MudText>
+        </div>
+
+        <div class="image-gallery">
+            <MudCard Class="gallery-item">
+                <MudSkeleton Variant="SkeletonVariant.CardMedia" />
+                <div class="overlay"></div>
+            </MudCard>
+            <MudCard Class="gallery-item">
+                <MudSkeleton Variant="SkeletonVariant.CardMedia" />
+                <div class="overlay"></div>
+            </MudCard>
+            <MudCard Class="gallery-item">
+                <MudSkeleton Variant="SkeletonVariant.CardMedia" />
+                <div class="overlay"></div>
+            </MudCard>
+        </div>
+    </div>
+</MudContainer>
+
+<style>
+    .toolbar-content {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .logo {
+        font-size: 24px;
+        font-weight: bold;
+    }
+
+    .main-content {
+        padding: 32px;
+        text-align: center;
+    }
+
+    .about-section {
+        margin-bottom: 64px;
+    }
+
+    .about-heading {
+        margin-bottom: 16px;
+        font-weight: bold;
+        color: #007bff; /* Blue color */
+    }
+
+    .about-text {
+        color: #333; /* Dark gray color */
+    }
+
+    .image-gallery {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 16px;
+    }
+
+    .gallery-item {
+        position: relative;
+        overflow: hidden;
+        border-radius: 8px;
+    }
+
+    .overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 123, 255, 0.5); /* Cyan-ish overlay */
+        opacity: 0;
+        transition: opacity 0.3s ease-in-out;
+    }
+
+    .gallery-item:hover .overlay {
+        opacity: 1;
+    }
+</style>

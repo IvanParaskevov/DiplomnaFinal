@@ -1,0 +1,76 @@
+﻿@inherits LayoutComponentBase
+@using MudBlazor
+
+<MudThemeProvider Theme="MyCustomTheme"/>
+<MudDialogProvider />
+<MudSnackbarProvider />
+
+<MudLayout>
+
+    <MudAppBar>
+        <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" Edge="Edge.Start" OnClick="@((e) => DrawerToggle())" />
+        Медицински център "City Centre"
+    </MudAppBar>
+
+    <MudDrawer @bind-Open="@_drawerOpen" Elevation="21" Anchor="Anchor.Top" Variant="@DrawerVariant.Temporary">
+
+        <MudDrawerHeader Class=" border-b-4 border-solid mud-border-primary pa-4">
+            <MudText Typo="Typo.h4" Align="Align.Center">Меню</MudText>
+        </MudDrawerHeader>
+
+        <MudDrawerContainer>
+
+			<NavMenu />
+
+            <AuthorizeView>
+                <Authorized>
+
+                    
+
+
+                    <MudNavLink Href="/logout" Match="NavLinkMatch.Prefix">
+                        Изход от профил
+                    </MudNavLink>
+
+                </Authorized>
+                <NotAuthorized>
+
+					<MudNavLink Href="login" Match="NavLinkMatch.Prefix">
+						Вход в профил
+					</MudNavLink>
+
+					<MudNavLink Href="/register" Match="NavLinkMatch.Prefix">
+						Регистрация на акаунт
+					</MudNavLink>                  
+
+                </NotAuthorized>
+            </AuthorizeView>
+        </MudDrawerContainer>
+    </MudDrawer>
+    <MudMainContent>
+		
+        @Body
+        
+    </MudMainContent>
+</MudLayout>
+
+@code {
+    bool _drawerOpen = false;
+
+    void DrawerToggle()
+    {
+        _drawerOpen = !_drawerOpen;
+    }
+
+    MudTheme MyCustomTheme = new MudTheme()
+    {
+       Palette = new()
+       {
+           Primary = Colors.LightGreen.Lighten1,
+           Secondary = Colors.Indigo.Lighten2,
+           AppbarBackground = Colors.Cyan.Default
+
+       }
+
+    };
+}

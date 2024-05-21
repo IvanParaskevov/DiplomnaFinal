@@ -1,0 +1,47 @@
+﻿@page "/logout"
+@using CityCentreProject.Components.Services
+@using Microsoft.AspNetCore.Authentication
+@using System.Security.Claims
+@using Microsoft.AspNetCore.Identity
+@inject NavigationManager navigationManager
+@inject AuthenticationStateProvider authenticationStateProvider;
+
+
+<MudPaper>
+    <MudPaper><span>Успешно се отписахте, довиждане!</span></MudPaper>
+    <MudPaper>@errorMessage</MudPaper>
+    </MudPaper>
+
+    @code {
+    private ClaimsPrincipal userClaims;
+    private AuthenticationState authenticationState;
+    private string errorMessage;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            authenticationState = await authenticationStateProvider.GetAuthenticationStateAsync();
+            userClaims = authenticationState.User;
+            if (userClaims is not null && userClaims.Identity.IsAuthenticated)
+            {
+                var customAuthenticationStateProvider = (CustomAuthenticationStateProvider)authenticationStateProvider;
+                await customAuthenticationStateProvider.UpdateAuthenticationState(null);
+
+                // if the above does not work:
+                //inject SignInManager => call: signInManager.SignOutAsync()
+                //await signInManager.SignOutAsync();
+
+                await Task.Delay(1000);
+                navigationManager.NavigateTo("/", true);
+            }
+        }
+        catch
+        {
+            errorMessage = "Вие не сте автентикирани!";
+            return;
+        }
+
+        await base.OnInitializedAsync();
+    }
+}

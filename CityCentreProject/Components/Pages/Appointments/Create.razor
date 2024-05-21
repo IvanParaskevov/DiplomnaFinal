@@ -1,0 +1,105 @@
+﻿@using BusinessLayer
+@using static BusinessLayer.Appointment
+@using CityCentreProject.Components.Services
+@using DataLayer
+@using ServiceLayer
+@inject NavigationManager navigationManager;
+@inject AppointmentManager appointmentManager;
+@inject PatientManager patientManager;
+@inject StateContainer<Doctor> doctorContainer;
+@inject StateContainer<Patient> patientContainer;
+@inject DoctorAvailableHoursManager availableHoursManager;
+@inject AuthenticationStateProvider authenticationState;
+<h1>Създай</h1>
+
+<h4>Запис</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <MudForm Model="Model">
+            <MudSelect @bind-Value="Model.Reason" Label="Reason">
+                @foreach (AppointmentReason reason in Enum.GetValues(typeof(AppointmentReason)))
+                {
+                    <MudSelectItem Value="@reason">@reason.ToString()</MudSelectItem>
+                }
+            </MudSelect>
+            <div class="form-group">
+                <MudTextField @bind-Value="Model.Description"
+                              T="string" class="form-control"
+                              Label="Описание"
+                              Variant="Variant.Outlined"
+                              For="@( () => Model.Description )" />
+            </div>
+            <MudDatePicker id="date" Label="дата" ShowWeekNumbers="true" DateFormat="dd.MM.yyyy" @bind-DateTime="Model.Date" DateChanged="GetSelectedDayHours" />
+
+            <MudSelect @bind-Value="Model.StartTime" Label="Time">
+                @foreach (DoctorAvailableHours time in doctorModel.AvailableHours.Where(d => d.DayOfWeek == Model.Date.DayOfWeek))
+                {
+
+                    @if (takenTimes.Contains(time.StartTime))
+                    {
+                        <MudSelectItem Value="@time.StartTime">@time.StartTime.ToString()</MudSelectItem>
+                    }
+
+                }
+            </MudSelect>
+
+            <div class="form-group">
+                <MudButton Variant="Variant.Filled"
+                           StartIcon="@Icons.Material.Filled.Save"
+                           IconColor="Color.Primary"
+                           Size="Size.Large"
+                           OnClick="CreateAppointment">Save</MudButton>
+            </div>
+
+        </MudForm>
+    </div>
+</div>
+
+<div class="form-group">
+    <MudButton Variant="Variant.Filled"
+               IconColor="Color.Secondary"
+               Size="Size.Large"
+               Href="userIndex">Back</MudButton>
+</div>
+
+@code {
+    Appointment Model = new();
+    Doctor doctorModel = new();
+    Patient patientModel = new();
+    public List<TimeOnly?> takenTimes { get; set; }
+    protected override async Task OnInitializedAsync()
+    {
+        doctorModel = doctorContainer.Value;
+
+        if (doctorModel == null)
+        {
+            navigationManager.NavigateTo("/userIndex", true);
+        }
+        patientModel = patientContainer.Value;
+
+        if (patientModel == null)
+        {
+            navigationManager.NavigateTo("/userIndex", true);
+        }
+
+        takenTimes = await availableHoursManager.GetAvailableHours(doctorModel.Id, Model.Date.DayOfWeek);
+
+        // takenTimes = await availableHoursManager.GetAvailableHours(doctorModel.Id, Model.Date.DayOfWeek);
+        await base.OnInitializedAsync();
+    }
+    private async Task<List<TimeOnly?>> GetSelectedDayHours()
+    {
+        takenTimes = doctorModel.Appointments.Where(d => d.Date == Model.Date).Select(a => a.StartTime).ToList();
+        return takenTimes;
+    }
+    private async Task CreateAppointment()
+    {
+        Model.StartTime = new TimeOnly(3, 23);
+        Model.EndTime = new TimeOnly(4, 23);
+        Model.Doctor = doctorModel;
+        Model.Patient = patientModel;
+        await appointmentManager.CreateAsync(Model);
+        navigationManager.NavigateTo("/userIndex", true);
+    }
+}
